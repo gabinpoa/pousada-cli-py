@@ -1,10 +1,17 @@
-from enums import CategoriaQuarto
+from typing import Literal
 from produto import Produto
 
+class CategoriaQuarto:
+    STANDARD = 'S'
+    MASTER   = 'M'
+    PREMIUM  = 'P'
+
+type Categoria = Literal['S', 'M', 'P']
+
 class Quarto:
-    def __init__(self, numero: int, categoria: CategoriaQuarto, diaria: float, consumo: list[int]):
+    def __init__(self, numero: int, categoria: str | Categoria, diaria: float, consumo: list[int] = []):
         self.__numero = numero
-        self.__categoria = categoria.name
+        self.__categoria = categoria
         self.__diaria = diaria
         self.__consumo = consumo
 
@@ -12,21 +19,21 @@ class Quarto:
     def numero(self):
         return self.__numero
     @numero.setter
-    def numero(self, numero):
+    def numero(self, numero: int):
         self.__numero = numero
 
     @property
-    def categoria(self):
+    def categoria(self) -> str | Categoria:
         return self.__categoria
     @categoria.setter
-    def categoria(self, categoria):
+    def categoria(self, categoria: Categoria):
         self.__categoria = categoria
 
     @property
     def diaria(self):
         return self.__diaria
     @diaria.setter
-    def diaria(self, diaria):
+    def diaria(self, diaria: float):
         self.__diaria = diaria
 
     @property

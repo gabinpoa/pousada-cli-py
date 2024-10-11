@@ -1,9 +1,7 @@
 from collections.abc import Callable
-from datetime import date
 
-
-## Funcao para substituir list.index()
-## Diferença: Quando item não é encontrado na lista, retorna -1 ao invés de levantar um erro
+# Funcao para substituir list.index()
+# Diferença: Quando item não é encontrado na lista, retorna -1 ao invés de levantar um erro
 def indice[T](lista: list[T], funcao: Callable[[T], bool]) -> int:
     for i, item in enumerate(lista):
         if funcao(item) == True:

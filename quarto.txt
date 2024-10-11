@@ -1,0 +1,2 @@
+numero,categoria,diária,consumo
+7,S,90.0,"[1, 3, 1]"
