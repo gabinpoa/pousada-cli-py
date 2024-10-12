@@ -19,5 +19,3 @@ if __name__ == "__main__":
         menu.iniciar()
     except KeyboardInterrupt:
         print("\nSaindo do programa")
-    except ValueError as e:
-        print(e)

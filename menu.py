@@ -50,7 +50,11 @@ class Menu:
         while True:
             self.__mostrar_itens()
             if self.__seleciona_item() == True:
+                try:
                     self.__acionar_item()
+                except ValueError as e:
+                    print(e)
+                finally:
                     print("\n")
             else:
                 break
