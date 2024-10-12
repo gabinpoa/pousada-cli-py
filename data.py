@@ -15,12 +15,13 @@ def _parse_br_format_date(dtstr: str):
         raise ValueError("Year must have four digits")
 
     [day, month, year] = map(lambda x: int(x), splitted_dtstr)
-    return day, month, year
+    return year, month, day
 
 class data(date):
-    def __new__(cls, day: int, month: int, year: int):
-        """Inverte a ordem dos parametros para melhor se adaptar ao nosso uso de datas"""
-        return super().__new__(cls, year, month, day)
+    @classmethod
+    def hoje(cls):
+        hoje_date = super().today()
+        return cls(hoje_date.year, hoje_date.month, hoje_date.day)
 
     @classmethod
     def frombrformat(cls, date_string):
@@ -37,5 +38,5 @@ class data(date):
             raise ValueError(f'Invalid brformat string: {date_string!r}')
 
     def __str__(self) -> str:
-        return self.strftime("%d/%m/%y")
+        return self.strftime("%d/%m/%Y")
 

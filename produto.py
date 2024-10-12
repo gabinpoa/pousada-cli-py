@@ -26,4 +26,4 @@ class Produto:
         self.__preco = preco
 
     def __str__(self):
-        return f'{self.nome}: R$ {self.preco:.2f}'
+        return f'{self.nome} - R$ {self.preco:.2f}'

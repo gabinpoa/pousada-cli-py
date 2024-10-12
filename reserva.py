@@ -1,10 +1,10 @@
 from enums import StatusReserva
 from uteis import encontra
 from quarto import Quarto
-from datetime import date
+from data import data
 
 class Reserva:
-    def __init__(self, dia_inicio: str, dia_fim: str, cliente: str, quarto: int, status: StatusReserva = StatusReserva.CHECK_IN):
+    def __init__(self, dia_inicio: str, dia_fim: str, cliente: str, quarto: int, status: str = StatusReserva.CHECK_IN.value):
         self.__dia_inicio = dia_inicio
         self.__dia_fim = dia_fim
         self.__cliente = cliente
@@ -43,12 +43,12 @@ class Reserva:
     def status(self):
         return self.__status
     @status.setter
-    def status(self, status):
-        self.__status = status
+    def status(self, status: StatusReserva):
+        self.__status = status.value
 
     def infos(self, quartos: list[Quarto]) -> tuple[int, float, Quarto]:
         quarto = self.obj_quarto(quartos)
-        quantidade_dias = date.fromisoformat(self.dia_fim).toordinal() - date.fromisoformat(self.dia_inicio).toordinal()
+        quantidade_dias = data.frombrformat(self.dia_fim).toordinal() - data.frombrformat(self.dia_inicio).toordinal()
         valor_total_diarias = quantidade_dias * quarto.diaria
         return quantidade_dias, valor_total_diarias, quarto
 

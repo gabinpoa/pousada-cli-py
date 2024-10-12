@@ -20,34 +20,42 @@ class Menu:
             system('clear')
 
     def __mostrar_itens(self):
+        print("0 - Sair")
         for item in self.__itens:
             print(f'{item.codigo} - {item.nome}')
 
     ## Retorna booleano para indicar se o programa deve continuar
     def __seleciona_item(self) -> bool:
         codigo = int(input("Qual ação você quer realizar? "))
-        indice_item = indice(self.__itens, lambda item : item.codigo == codigo)
-        if codigo == -1:
-            self.__limpar()
-            print("!    Selecione uma opção existente   !")
-            return self.__seleciona_item()
-        elif codigo == 0:
+        if codigo == 0:
             self.__limpar()
             print("Saindo do programa")
             return False
+        indice_item = indice(self.__itens, lambda item : item.codigo == codigo)
+        if indice_item == -1:
+            self.__limpar()
+            print("!    Selecione uma opção existente   !")
+            self.__mostrar_itens()
+            return self.__seleciona_item()
         else:
             self.__indice_selecionado = indice_item
             return True
 
     def __acionar_item(self):
         self.__limpar()
-        print(f'Selecionado: {self.__itens[self.__indice_selecionado].nome}')
+        print(f'Selecionado: {self.__itens[self.__indice_selecionado].nome}\n')
         self.__itens[self.__indice_selecionado].funcao()
 
     def iniciar(self):
-        self.__mostrar_itens()
         while True:
+            self.__mostrar_itens()
             if self.__seleciona_item() == True:
-                self.__acionar_item()
+                try:
+                    self.__acionar_item()
+                except ValueError as e:
+                    self.__limpar()
+                    print(e)
+                finally:
+                    print("\n")
             else:
                 break

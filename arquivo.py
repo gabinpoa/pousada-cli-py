@@ -1,4 +1,5 @@
 import csv
+from types import FunctionType
 
 class Arquivo:
     def __init__(self, classe):
@@ -47,13 +48,13 @@ class Arquivo:
 
     def __coleta_dados_objetos(self, objs_para_salvar: list):
         self.__lista_dados = []
-        self.__cabecalho = [nome_atr for nome_atr in self.__classe.__dict__ if not nome_atr.startswith("__")]
+        self.__cabecalho = [nome for nome, val in self.__classe.__dict__.items() if not nome.startswith("__") and not isinstance(val, FunctionType)]
         for objeto in objs_para_salvar:
             dados_objeto = []
             for nome_atr, valor in objeto.__dict__.items():
-                if not nome_atr.startswith("__"):
-                    if type(valor) == list:
-                        dados_objeto.append("[{}]".format(",".join(valor)))
+                if not nome_atr.startswith("__") and not isinstance(valor, FunctionType):
+                    if type(valor) == list[int]:
+                        dados_objeto.append("[{}]".format(",".join(map(lambda num: str(num), valor))))
                     else:
                         dados_objeto.append(valor)
             self.__lista_dados.append(dados_objeto)

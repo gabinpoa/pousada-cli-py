@@ -1,4 +1,2 @@
 codigo,nome,preco
-1,chocolate,6.99
-2,café com leite,5.99
-3,energético,10.99
+1,Chocolate Lacta,8.99

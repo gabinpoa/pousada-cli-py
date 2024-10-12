@@ -2,9 +2,9 @@ from enums import CategoriaQuarto
 from produto import Produto
 
 class Quarto:
-    def __init__(self, numero: int, categoria: CategoriaQuarto, diaria: float, consumo: list[int]):
+    def __init__(self, numero: int, categoria: str, diaria: float, consumo: list[int] = []):
         self.__numero = numero
-        self.__categoria = categoria.name
+        self.__categoria = categoria
         self.__diaria = diaria
         self.__consumo = consumo
 
@@ -19,8 +19,8 @@ class Quarto:
     def categoria(self):
         return self.__categoria
     @categoria.setter
-    def categoria(self, categoria):
-        self.__categoria = categoria
+    def categoria(self, categoria: CategoriaQuarto):
+        self.__categoria = categoria.value
 
     @property
     def diaria(self):
