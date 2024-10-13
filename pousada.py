@@ -116,20 +116,22 @@ class Pousada:
         dia = int(input("Insira o dia para consultar: "))
         self.consulta_disponibilidade(dia, n_quarto)
 
-    def consulta_reserva(self, data: str | None, cliente: str | None, n_quarto: int | None):
+    def consulta_reserva(self, data: str, cliente: str, n_quarto: str):
         def funcao_busca(reserva: Reserva) -> bool:
             """
             Verifica quais parametros foram inseridos pelo usuário
             e os adiciona à condição de busca de reservas ativas
             """
             cond_busca: bool = reserva.status == StatusReserva.ATIVA
-            if cliente:
+
+            if cliente != "":
                 cond_busca = cond_busca and cliente == reserva.cliente 
-            if n_quarto:
-                cond_busca = cond_busca and n_quarto == reserva.quarto.numero
-            if data:
+            if n_quarto != "":
+                cond_busca = cond_busca and int(n_quarto) == reserva.quarto.numero
+            if data != "":
                 cond_busca = cond_busca and data == reserva.dia_inicio 
-            if not (data or n_quarto or cliente):
+
+            if data == "" and n_quarto == "" and cliente == "":
                 cond_busca = False
             return cond_busca
 
@@ -152,13 +154,8 @@ class Pousada:
         Imprime os dados de cada reserva ativa que corresponder aos parametros inseridos por input
         """
         cliente = input("Nome do hóspede (ENTER para pular):  ")
-        cliente = None if cliente == "" else cliente
-
         n_quarto = input("Número do quarto (ENTER para pular): ")
-        n_quarto = None if n_quarto == "" else int(n_quarto)
-
         dia = input("Dia da reserva (ENTER para pular): ")
-        dia = None if dia == "" else dia
 
         self.consulta_reserva(dia, cliente, n_quarto)
             
