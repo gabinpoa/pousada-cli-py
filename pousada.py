@@ -1,5 +1,4 @@
 from quarto import Quarto
-import quarto
 from reserva import Reserva, Status, StatusReserva
 from produto import Produto
 from arquivo import Arquivo
