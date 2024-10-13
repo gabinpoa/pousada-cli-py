@@ -52,19 +52,24 @@ class Reserva:
     def status(self, status: Status):
         self.__status = status
 
-    def total_diarias(self):
+    def valor_diarias(self) -> float:
+        """Retorna o valor total das diárias"""
         return self.quantidade_dias() * self.quarto.diaria
 
-    def quantidade_dias(self):
+    def quantidade_dias(self) -> int:
+        """Retorna a duração em dias da reserva"""
         return self.dia_fim - self.dia_inicio
 
     def cancela(self):
+        """Muda status para cancelada e esvazia consumo"""
         self.status = 'C'
         self.quarto.limpa_consumo()
 
     def checkin(self):
+        """Muda status para ativa"""
         self.status = 'A'
 
     def checkout(self):
+        """Muda status para check-out e esvazia consumo"""
         self.status = 'O'
         self.quarto.limpa_consumo()

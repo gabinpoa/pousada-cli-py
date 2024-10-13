@@ -4,13 +4,14 @@ from quarto import Quarto
 from produto import Produto
 from uteis import encontra
 
-# Classe estática
-# para abstrair a parte relacionada a manipulação de arquivo
 class Arquivo:
+    """Classe estática para abstrair a parte relacionada a manipulação de arquivo"""
     @classmethod
     def carrega_produtos(cls):
-        # Espera-se que os dados estejam na ordem:
-        # codigo, nome, preco
+        """
+        Espera-se que os dados estejam na ordem:
+        codigo, nome, preco
+        """
         dados = cls.__carrega_dados("produto.txt")
         produtos: list[Produto] = []
         for linha in dados:
@@ -26,8 +27,10 @@ class Arquivo:
 
     @classmethod
     def carrega_quartos(cls):
-        # Espera-se que os dados estejam na ordem:
-        # numero, categoria, diária, consumo
+        """
+        Espera-se que os dados estejam na ordem:
+        numero, categoria, diária, consumo
+        """
         dados = cls.__carrega_dados("quarto.txt")
         quartos: list[Quarto] = []
         for linha in dados:
@@ -44,8 +47,10 @@ class Arquivo:
 
     @classmethod
     def carrega_reservas(cls, quartos: list[Quarto]):
-        # Espera-se que os dados estejam na ordem:
-        # dia_inicio, dia_fim, cliente, quarto, status
+        """
+        Espera-se que os dados estejam na ordem:
+        dia_inicio, dia_fim, cliente, quarto, status
+        """
         dados = cls.__carrega_dados("reserva.txt")
         reservas: list[Reserva] = []
         for linha in dados:

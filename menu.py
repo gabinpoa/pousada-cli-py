@@ -24,8 +24,8 @@ class Menu:
         for item in self.__itens:
             print(f'{item.codigo} - {item.nome}')
 
-    ## Retorna booleano para indicar se o programa deve continuar
     def __seleciona_item(self) -> bool:
+        """Retorna booleano para indicar se o programa deve continuar"""
         codigo = int(input("Qual ação você quer realizar? "))
         if codigo == 0:
             self.__limpar()

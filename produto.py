@@ -25,5 +25,6 @@ class Produto:
     def preco(self, preco: float):
         self.__preco = preco
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Retorna str com nome e preço do produto"""
         return f'{self.nome}: R$ {self.preco:.2f}'
