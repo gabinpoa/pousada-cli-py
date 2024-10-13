@@ -1,4 +1,5 @@
 from quarto import Quarto
+import quarto
 from reserva import Reserva, Status, StatusReserva
 from produto import Produto
 from arquivo import Arquivo
@@ -75,16 +76,7 @@ class Pousada:
             raise ValueError("Nenhuma reserva com status {} no nome de {}.".format(status, cliente))
         return reserva
 
-    def __cliente_por_input(self) -> str:
-        """Retorna nome do cliente inserido por input"""
-        cliente = input("Nome do hóspede: ")
-        if cliente == "":
-            raise ValueError("Nome do hóspede não pode ser vazio")
-        return cliente
-
-    def __quarto_por_input(self) -> Quarto:
-        """Retorna quarto com número do quarto igual ao inserido por input"""
-        numero = int(input("Número do quarto: "))
+    def __encontra_quarto(self, numero: int):
         quarto = encontra(self.quartos, lambda q : q.numero == numero)
         if not quarto:
             raise ValueError("Quarto com número inserido {} não existe".format(numero))
@@ -105,52 +97,46 @@ class Pousada:
         Arquivo.salva_quartos(self.quartos)
         Arquivo.salva_reservas(self.reservas)
 
-    def consulta_disponibilidade(self):
-        """
-        Recebe número do quarto e dia por input.
-        Se quarto estiver disponível no dia, imprime que está disponível e dados de quarto.
-        Se não, imprime que está indisponível.
-        """
-        quarto = self.__quarto_por_input()
-        dia = int(input("Insira o dia para consultar: "))
-
-        disponivel = self.__dia_disponivel_quarto(dia, quarto)
-        if disponivel:
+    def consulta_disponibilidade(self, dia: int, n_quarto: int):
+        quarto = self.__encontra_quarto(n_quarto)
+        esta_disponivel = self.__dia_disponivel_quarto(dia, quarto)
+        if esta_disponivel:
             print("DISPONÍVEL. Quarto {} está disponível para o dia {}.".format(quarto.numero, dia))
             print(quarto)
         else:
             print("INDISPONÍVEL. Quarto {} NÃO está disponível para o dia {}.".format(quarto.numero, dia))
 
-    def consulta_reserva(self):
+    def menu_consulta_disponibilidade(self):
         """
-        Recebe nome do cliente, número do quarto e dia por input.
-        Todos inputs são opcionais, mas ao menos um deve ser preenchido.
-        Imprime os dados de cada reserva ativa que corresponder aos parametros inseridos por input
+        Recebe número do quarto e dia por input.
+        Se quarto estiver disponível no dia, imprime que está disponível e dados de quarto.
+        Se não, imprime que está indisponível.
         """
-        cliente = input("Nome do hóspede (ENTER para pular):  ")
-        numero_quarto = input("Número do quarto (ENTER para pular): ")
-        dia_buscado = input("Dia da reserva (ENTER para pular): ")
+        n_quarto = int(input("Número do quarto: "))
+        dia = int(input("Insira o dia para consultar: "))
+        self.consulta_disponibilidade(dia, n_quarto)
 
+    def consulta_reserva(self, data: str | None, cliente: str | None, n_quarto: int | None):
         def funcao_busca(reserva: Reserva) -> bool:
             """
             Verifica quais parametros foram inseridos pelo usuário
             e os adiciona à condição de busca de reservas ativas
             """
-            condicao_de_busca: bool = reserva.status == StatusReserva.ATIVA
-            if len(cliente) > 0:
-                condicao_de_busca = condicao_de_busca and cliente == reserva.cliente 
-            if len(numero_quarto) > 0:
-                condicao_de_busca = condicao_de_busca and numero_quarto == reserva.quarto 
-            if len(dia_buscado) > 0:
-                condicao_de_busca = condicao_de_busca and dia_buscado == reserva.dia_inicio 
-            if len(dia_buscado) == 0 and len(numero_quarto) == 0 and len(cliente) == 0:
-                condicao_de_busca = False
-            return condicao_de_busca
+            cond_busca: bool = reserva.status == StatusReserva.ATIVA
+            if cliente:
+                cond_busca = cond_busca and cliente == reserva.cliente 
+            if n_quarto:
+                cond_busca = cond_busca and n_quarto == reserva.quarto.numero 
+            if data:
+                cond_busca = cond_busca and data == reserva.dia_inicio 
+            if not (data or n_quarto or cliente):
+                cond_busca = False
+            return cond_busca
 
         reservas = encontra_varios(self.reservas, funcao_busca)
         if len(reservas) == 0:
             raise ValueError("Nenhuma reserva ativa encontrada com os parametros informados.")
-
+        
         for reserva in reservas:
             print("Data de início: {}\nData de fim: {}".format(reserva.dia_inicio, reserva.dia_fim))
             print("Nome do cliente: {}".format(reserva.cliente))
@@ -158,46 +144,66 @@ class Pousada:
             print("Produtos consumidos:")
             for produto in reserva.quarto.lista_consumo(self.produtos):
                 print("\t{}".format(produto))
+
+    def menu_consulta_reserva(self):
+        """
+        Recebe nome do cliente, número do quarto e dia por input.
+        Todos inputs são opcionais, mas ao menos um deve ser preenchido.
+        Imprime os dados de cada reserva ativa que corresponder aos parametros inseridos por input
+        """
+        cliente = input("Nome do hóspede (ENTER para pular):  ")
+        cliente = None if cliente == "" else cliente
+
+        n_quarto = input("Número do quarto (ENTER para pular): ")
+        n_quarto = None if n_quarto == "" else int(n_quarto)
+
+        dia = input("Dia da reserva (ENTER para pular): ")
+        dia = None if dia == "" else dia
+
+        self.consulta_reserva(dia, cliente, n_quarto)
             
-    def realiza_reserva(self):
+    def realiza_reserva(self, data: tuple[int, int], cliente: str, n_quarto: int):
+        dia_inicio, dia_fim = data
+        quarto = self.__encontra_quarto(n_quarto)
+
+        disponivel_quarto = self.__dias_disponiveis_quarto(dia_inicio, dia_fim, quarto)
+        disponivel_cliente = self.__cliente_disponivel(cliente)
+        
+        if not disponivel_quarto:
+            raise ValueError("INDISPONÍVEL. Quarto {} NÃO está disponível para a os dias informados.".format(quarto.numero))
+        elif not disponivel_cliente:
+            raise ValueError("'{}' já possui uma reserva em andamento.".format(cliente))
+        
+        self.reservas.append(Reserva(dia_inicio, dia_fim, cliente, quarto))
+        print("Reserva do quarto {} entre os dias {} e {} efetuada com sucesso.".format(quarto.numero, dia_inicio, dia_fim))
+
+    def menu_realiza_reserva(self):
         """
         Recebe dia inicial, dia final, número do quarto e nome do cliente por input.
         Se cliente puder realizar reserva e quarto estiver disponível nos dias informados,
         realiza reserva e imprime mensagem de sucesso.
         Se não, imprime mensagem informativa de erro.
         """
-        dia_inicio = int(input("Dia de início: "))
-        dia_fim = int(input("Dia de fim: "))
-        quarto = self.__quarto_por_input()
-        cliente = self.__cliente_por_input()
+        data = int(input("Dia de início: ")), int(input("Dia de fim: "))
+        n_quarto = int(input("Número do quarto: "))
+        cliente = input("Nome do hóspede: ")
         
-        disponivel_quarto = self.__dias_disponiveis_quarto(dia_inicio, dia_fim, quarto)
-        disponivel_cliente = self.__cliente_disponivel(cliente)
-
-        if not disponivel_quarto:
-            raise ValueError("INDISPONÍVEL. Quarto {} NÃO está disponível para a os dias informados.".format(quarto.numero))
-        elif not disponivel_cliente:
-            raise ValueError("'{}' já possui uma reserva em andamento.".format(cliente))
-
-        self.reservas.append(Reserva(dia_inicio, dia_fim, cliente, quarto))
-        print("Reserva do quarto {} entre os dias {} e {} efetuada com sucesso.".format(quarto.numero, dia_inicio, dia_fim))
+        self.realiza_reserva(data, cliente, n_quarto)
         
-    def cancela_reserva(self):
-        """
-        Recebe nome do cliente por input.
-        Encontra reserva ativa do cliente, esvazia consumo e muda status para cancelada. 
-        """
-        cliente = self.__cliente_por_input()
+    def cancela_reserva(self, cliente: str):
         reserva = self.__encontra_reserva(cliente, StatusReserva.ATIVA)
         reserva.cancela()
         print("Reserva cancelada.")
 
-    def realiza_checkin(self):
+    def menu_cancela_reserva(self):
         """
         Recebe nome do cliente por input.
-        Encontra reserva para check-in do cliente, imprime seus dados e muda status para ativa. 
+        Encontra reserva ativa do cliente, esvazia consumo e muda status para cancelada. 
         """
-        cliente = self.__cliente_por_input()
+        cliente = input("Nome do hóspede: ")
+        self.cancela_reserva(cliente)
+
+    def realiza_checkin(self, cliente: str):
         reserva = self.__encontra_reserva(cliente, StatusReserva.CHECK_IN)
         print("Dia de início: {}\nDia de fim: {}".format(reserva.dia_inicio, reserva.dia_fim))
         print("Quantidade de dias reservados: {}".format(reserva.quantidade_dias()))
@@ -205,18 +211,20 @@ class Pousada:
         print(reserva.quarto)
         reserva.checkin()
 
-    def realiza_checkout(self):
+    def menu_realiza_checkin(self):
         """
         Recebe nome do cliente por input.
-        Encontra reserva ativa do cliente, imprime seus dados e valores finais,
-        esvazia consumo e muda status para check-out. 
+        Encontra reserva para check-in do cliente, imprime seus dados e muda status para ativa. 
         """
-        cliente = self.__cliente_por_input()
+        cliente = input("Nome do hóspede: ")
+        self.realiza_checkin(cliente)
+
+    def realiza_checkout(self, cliente: str):
         reserva = self.__encontra_reserva(cliente, StatusReserva.ATIVA)
         valor_diarias = reserva.valor_diarias()
         valor_consumo = reserva.quarto.valor_total_consumo(self.produtos)
         valor_final = valor_consumo + valor_diarias
-
+        
         print("Data de início: {}\nData de fim: {}".format(reserva.dia_inicio, reserva.dia_fim))
         print("Dias reservados: {}".format(reserva.quantidade_dias()))
         print("Valor total das diárias: R$ {:.2f}".format(valor_diarias))
@@ -226,15 +234,27 @@ class Pousada:
         print("Valor final: R$ {:.2f}".format(valor_final))
         reserva.checkout()
 
-    def registra_consumo(self):
+    def menu_realiza_checkout(self):
+        """
+        Recebe nome do cliente por input.
+        Encontra reserva ativa do cliente, imprime seus dados e valores finais,
+        esvazia consumo e muda status para check-out. 
+        """
+        cliente = input("Nome do hóspede: ")
+        self.realiza_checkout(cliente)
+
+    def registra_consumo(self, cliente: str, codigo_produto: int):
+        reserva = self.__encontra_reserva(cliente, StatusReserva.ATIVA)
+        reserva.quarto.adiciona_consumo(codigo_produto)
+
+    def menu_registra_consumo(self):
         """
         Recebe nome do cliente por input.
         Imprime produtos disponíveis e recebe código do produto por input.
         Encontra produto com código recebido e adiciona seu código a lista de consumo
         da reserva ativa do cliente. 
         """
-        cliente = self.__cliente_por_input()
-        reserva = self.__encontra_reserva(cliente, StatusReserva.ATIVA)
+        cliente = input("Nome do hóspede: ")
 
         print("Produtos disponíveis: ")
         for produto in self.produtos:
@@ -244,4 +264,4 @@ class Pousada:
         if not encontra(self.produtos, lambda p: p.codigo == codigo_selecionado):
             raise ValueError("Código inserido '{}' não corresponde a nenhum produto.".format(codigo_selecionado))
 
-        reserva.quarto.adiciona_consumo(codigo_selecionado)
+        self.registra_consumo(cliente, codigo_selecionado)
