@@ -126,7 +126,7 @@ class Pousada:
             if cliente:
                 cond_busca = cond_busca and cliente == reserva.cliente 
             if n_quarto:
-                cond_busca = cond_busca and n_quarto == reserva.quarto.numero 
+                cond_busca = cond_busca and n_quarto == reserva.quarto.numero
             if data:
                 cond_busca = cond_busca and data == reserva.dia_inicio 
             if not (data or n_quarto or cliente):
