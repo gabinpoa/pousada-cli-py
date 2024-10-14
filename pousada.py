@@ -115,7 +115,7 @@ class Pousada:
         dia = int(input("Insira o dia para consultar: "))
         self.consulta_disponibilidade(dia, n_quarto)
 
-    def consulta_reserva(self, data: str, cliente: str, n_quarto: str):
+    def consulta_reserva(self, dia: str, cliente: str, n_quarto: str):
         def funcao_busca(reserva: Reserva) -> bool:
             """
             Verifica quais parametros foram inseridos pelo usuário
@@ -127,10 +127,10 @@ class Pousada:
                 cond_busca = cond_busca and cliente == reserva.cliente 
             if n_quarto != "":
                 cond_busca = cond_busca and int(n_quarto) == reserva.quarto.numero
-            if data != "":
-                cond_busca = cond_busca and data == reserva.dia_inicio 
+            if dia != "":
+                cond_busca = cond_busca and int(dia) in range(reserva.dia_inicio, reserva.dia_fim + 1)
 
-            if data == "" and n_quarto == "" and cliente == "":
+            if dia == "" and n_quarto == "" and cliente == "":
                 cond_busca = False
             return cond_busca
 
