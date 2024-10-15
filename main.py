@@ -6,15 +6,16 @@ if __name__ == "__main__":
         pousada = Pousada("Pousada do Mar", "51 99592-6116")
         pousada.carrega_dados()
 
-        funcoes_menu = [MenuItem(1, "Consultar disponibilidade", pousada.menu_consulta_disponibilidade)]
-        funcoes_menu.append(MenuItem(2, "Consultar reserva", pousada.menu_consulta_reserva))
-        funcoes_menu.append(MenuItem(3, "Realizar reserva", pousada.menu_realiza_reserva))
-        funcoes_menu.append(MenuItem(4, "Cancelar reserva", pousada.menu_cancela_reserva))
-        funcoes_menu.append(MenuItem(5, "Realizar check-in", pousada.menu_realiza_checkin))
-        funcoes_menu.append(MenuItem(6, "Realizar check-out", pousada.menu_realiza_checkout))
-        funcoes_menu.append(MenuItem(7, "Registra consumo", pousada.menu_registra_consumo))
-        funcoes_menu.append(MenuItem(8, "Salvar", pousada.salva_dados))
-
+        funcoes_menu = [
+            MenuItem(1, "Consultar disponibilidade", Menu.dia_n_quarto(pousada.consulta_disponibilidade)),
+            MenuItem(2, "Consultar reserva", Menu.str_dia_cliente_n_quarto_opcional(pousada.consulta_reserva)),
+            MenuItem(3, "Realizar reserva", Menu.data_cliente_n_quarto(pousada.realiza_reserva)),
+            MenuItem(4, "Cancelar reserva", Menu.cliente(pousada.cancela_reserva)),
+            MenuItem(5, "Realizar check-in", Menu.cliente(pousada.realiza_checkin)),
+            MenuItem(6, "Realizar check-out", Menu.cliente(pousada.realiza_checkout)),
+            MenuItem(7, "Registra consumo", pousada.menu_registra_consumo),
+            MenuItem(8, "Salvar", pousada.salva_dados)
+        ]
         menu = Menu(funcoes_menu)
         menu.iniciar()
     except KeyboardInterrupt:
