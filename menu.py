@@ -58,28 +58,3 @@ class Menu:
                     print("\n")
             else:
                 break
-
-    @classmethod
-    def cliente(cls, funcao: Callable[[str], None]):
-        cliente = input("Nome do hóspede: ")
-        return lambda : funcao(cliente)
-
-    @classmethod
-    def dia_n_quarto(cls, funcao: Callable[[int, int], None]):
-        n_quarto = int(input("Número do quarto: "))
-        dia = int(input("Dia: "))
-        return lambda : funcao(dia, n_quarto)
-
-    @classmethod
-    def data_cliente_n_quarto(cls, funcao: Callable[[tuple[int, int], str, int], None]):
-        data = int(input("Dia de início: ")), int(input("Dia de fim: "))
-        cliente = input("Nome do hóspede: ")
-        n_quarto = int(input("Número do quarto: "))
-        return lambda : funcao(data, cliente, n_quarto)
-
-    @classmethod
-    def str_dia_cliente_n_quarto_opcional(cls, funcao: Callable[[str, str, str], None]):
-        dia = input("Dia (ENTER para pular): ")
-        cliente = input("Nome do hóspede (ENTER para pular):  ")
-        n_quarto = input("Número do quarto (ENTER para pular): ")
-        return lambda : funcao(dia, cliente, n_quarto)
